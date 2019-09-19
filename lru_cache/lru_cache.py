@@ -1,3 +1,4 @@
+from doubly_linked_list import DoublyLinkedList
 class LRUCache:
   """
   Our LRUCache class keeps track of the max number of nodes it
@@ -7,7 +8,10 @@ class LRUCache:
   to every node stored in the cache.
   """
   def __init__(self, limit=10):
-    pass
+    self.limit = limit #max of how many nodes it can carry
+    self.size = 0 #length
+    self.order = DoublyLinkedList()
+    self.storage = dict()
 
   """
   Retrieves the value associated with the given key. Also
@@ -17,7 +21,13 @@ class LRUCache:
   key-value pair doesn't exist in the cache. 
   """
   def get(self, key):
-    pass
+    #pull the dict out of the dictionary
+    if key in self.storage:
+      node = self.storage[key]
+      self.order.move_to_front(node)
+      return node.value[1]
+    else:
+      return None
 
   """
   Adds the given key-value pair to the cache. The newly-
@@ -30,4 +40,24 @@ class LRUCache:
   the newly-specified value. 
   """
   def set(self, key, value):
-    pass
+    #Add  a pair to the cache
+    if key in self.storage:
+      node = self.storage[key]
+      node.value = (key, value) ##tying the tuple to the order
+      self.order.move_to_front(node)
+      return
+    #newly added pair most recently used
+    #oldest entry in the cache needs to be removed
+    if self.size == self.limit:
+      del self.storage[self.order.tail.value[0]] # remove from the dict
+      self.order.remove_from_tail() # remove from the linked list
+      self.size -= 1
+    
+    self.order.add_to_head((key, value))
+    self.storage[key] = self.order.head
+    self.size += 1 
+
+
+
+    #if the key already exists, overwrite old value, with new
+  
